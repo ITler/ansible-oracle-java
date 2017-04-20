@@ -10,8 +10,8 @@
 # user-configurable defaults
 #
 
-java_version: 8
-java_subversion: 112
+java_version: "8"
+java_subversion: "112"
 
 java_download_path: /tmp
 java_download_from_oracle: true
@@ -19,3 +19,15 @@ java_remove_download: true
 java_install_jce: false
 
 java_set_javahome: false
+
+
+java_install_multiple_versions: false
+# last defined version wins
+java_specification: []
+java_specification_defaults:
+  - major: 7
+    minor: 80
+  - major: 8
+    minor: 121
+
+java_specification_union_with_defaults: False

@@ -1,42 +1,30 @@
 ---
 # file: tasks/main.yml
-# Top-level installer for Oracle JDK.
+# Top-level installer for multiple Oracle JDK installations.
 #
 
-- name: precondition - java_version
-  fail: msg="ERROR - required variable 'java_version' missing."
-  when: java_version is not defined
+  - name: Regard default java specification
+    set_fact:
+      java_specification_real: "{{ java_specification_defaults }}"
+    when:
+      - (java_specification_union_with_defaults | bool == True) or (java_specification | length == 0)
 
-- name: precondition - java_subversion
-  fail: msg="ERROR - required variable 'java_subversion' missing."
-  when: java_subversion is not defined
+  - name: Regard custom java specification
+    set_fact:
+      java_specification_real: "{{ java_specification + java_specification_real | default([]) }}"
+    when:
+       - java_specification | length > 0
 
-- name: precondition - java_install_jce
-  fail: msg="ERROR - required variable 'java_install_jce' missing."
-  when: java_install_jce is not defined
+  - name: Realize multiple java installation
+    include: implement.yml
+    vars:
+      java_version: "{{ javaspec.major }}"
+      java_subversion: "{{ javaspec.minor }}"
+    with_items: "{{ java_specification_real }}"
+    when: java_install_multiple_versions | bool == True
+    loop_control:
+      loop_var: javaspec
 
-- include: set-role-variables.yml
-
-
-
-- name: install libselinux-python binary for Ansible to work
-  yum: name=libselinux-python state=present
-  when: ansible_pkg_mgr == "yum"
-
-- name: copy scripts to server
-  copy: src="../files/check-java-version.sh"  dest="{{ java_download_path }}/"  mode="a+x"
-
-- name: check if specific version of Oracle JDK is installed?
-  shell: LC_ALL="en_US.UTF-8"  {{ java_download_path }}/check-java-version.sh  "{{ jdk_version }}"
-  register: jdk_info
-  changed_when: false
-  failed_when: jdk_info.rc > 0
-
-#- debug: var=jdk_info
-
-- include: install.yml
-  when: (jdk_info.stdout|from_json).not_found
-
-- name: delegate to JCE zip installation process
-  include: install_jce.yml
-  when: java_install_jce
+  - name: Realize single java installation
+    include: implement.yml
+    when: java_install_multiple_versions | bool == False
