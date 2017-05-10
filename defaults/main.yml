@@ -22,7 +22,7 @@ java_set_javahome: false
 
 
 java_install_multiple_versions: false
-# last defined version wins
+# last defined version will be default
 java_specification: []
 java_specification_defaults:
   - major: 7
@@ -30,4 +30,4 @@ java_specification_defaults:
   - major: 8
     minor: 121
 
-java_specification_union_with_defaults: False
+java_specification_union_with_defaults: false

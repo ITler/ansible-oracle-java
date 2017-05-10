@@ -2,16 +2,15 @@
 # file: tasks/main.yml
 # Top-level installer for multiple Oracle JDK installations.
 #
-
   - name: Regard default java specification
     set_fact:
-      java_specification_real: "{{ java_specification_defaults }}"
+      java_installed_versions: "{{ java_specification_defaults }}"
     when:
       - (java_specification_union_with_defaults | bool == True) or (java_specification | length == 0)
 
   - name: Regard custom java specification
     set_fact:
-      java_specification_real: "{{ java_specification + java_specification_real | default([]) }}"
+      java_installed_versions: "{{ java_specification | union(java_installed_versions) }}"
     when:
        - java_specification | length > 0
 
@@ -20,11 +19,17 @@
     vars:
       java_version: "{{ javaspec.major }}"
       java_subversion: "{{ javaspec.minor }}"
-    with_items: "{{ java_specification_real }}"
-    when: java_install_multiple_versions | bool == True
+    with_items: "{{ java_installed_versions }}"
+    when:
+      - java_install_multiple_versions | bool
+      - java_installed_versions is defined and java_installed_versions is not none
+      - java_installed_versions | length > 0
     loop_control:
       loop_var: javaspec
 
   - name: Realize single java installation
     include: implement.yml
-    when: java_install_multiple_versions | bool == False
+    when:
+      - java_install_multiple_versions | bool == False
+      - java_version is defined and java_version is not none
+      - java_subversion is defined and java_subversion is not none

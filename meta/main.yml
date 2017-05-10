@@ -38,5 +38,4 @@ galaxy_info:
         - jdk
         - jvm
 
-allow_duplicates: yes
 dependencies: []
