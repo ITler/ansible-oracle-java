@@ -21,7 +21,7 @@
       java_subversion: "{{ javaspec.minor }}"
     with_items: "{{ java_installed_versions }}"
     when:
-      - java_install_multiple_versions | bool
+      - java_install_multiple_versions | bool == True
       - java_installed_versions is defined and java_installed_versions is not none
       - java_installed_versions | length > 0
     loop_control:

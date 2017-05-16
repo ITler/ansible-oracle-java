@@ -11,7 +11,7 @@
 #
 
 java_version: "8"
-java_subversion: "112"
+java_subversion: "121"
 
 java_download_path: /tmp
 java_download_from_oracle: true
@@ -22,12 +22,13 @@ java_set_javahome: false
 
 
 java_install_multiple_versions: false
+
 # last defined version will be default
 java_specification: []
 java_specification_defaults:
   - major: 7
     minor: 80
-  - major: 8
-    minor: 121
+  - major: "{{ java_version }}"
+    minor: "{{ java_subversion }}"
 
 java_specification_union_with_defaults: false
